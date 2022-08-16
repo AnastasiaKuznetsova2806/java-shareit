@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class UserStorageImpl implements UserStorage{
+public class UserStorageImpl implements UserStorage {
     private final CheckDataValidation validation;
     private long id = 1;
     private final Map<Long, User> users = new HashMap<>();
