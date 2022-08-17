@@ -1,9 +1,9 @@
-package ru.practicum.shareit.util.validation;
+package ru.practicum.shareit.common.validation;
 
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.exception.ConflictException;
-import ru.practicum.shareit.exception.DataNotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.common.exception.ConflictException;
+import ru.practicum.shareit.common.exception.DataNotFoundException;
+import ru.practicum.shareit.common.exception.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dto.UserDto;

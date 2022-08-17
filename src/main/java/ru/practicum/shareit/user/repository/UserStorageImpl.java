@@ -1,10 +1,10 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.exception.DataNotFoundException;
+import ru.practicum.shareit.common.exception.DataNotFoundException;
+import ru.practicum.shareit.common.validation.CheckDataValidation;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.util.validation.CheckDataValidation;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,13 +1,14 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.common.mapper.Mapper;
+import ru.practicum.shareit.common.validation.CheckDataValidation;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.UserStorage;
+import ru.practicum.shareit.item.repository.ItemStorage;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.util.mapper.Mapper;
-import ru.practicum.shareit.util.validation.CheckDataValidation;
+import ru.practicum.shareit.user.repository.UserStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,11 +80,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> searchItem(long userId, String text) {
         if (!text.isEmpty() || !text.isBlank()) {
             return findAllItem().stream()
-                    .filter(itemDto -> (
-                            itemDto.getName().toLowerCase().contains(text.toLowerCase()) ||
-                                    itemDto.getDescription().toLowerCase().contains(text.toLowerCase()
-                                    )
-                    ))
+                    .filter(itemDto -> searchInNameOrDescription(itemDto, text))
                     .filter(ItemDto::getAvailable)
                     .collect(Collectors.toList());
         }
@@ -100,5 +97,10 @@ public class ItemServiceImpl implements ItemService {
         Item item = Mapper.toItem(itemDto);
         item.setOwner(user);
         return item;
+    }
+
+    private boolean searchInNameOrDescription(ItemDto itemDto, String text) {
+        return itemDto.getName().toLowerCase().contains(text.toLowerCase()) ||
+                itemDto.getDescription().toLowerCase().contains(text.toLowerCase());
     }
 }

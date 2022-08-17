@@ -1,10 +1,13 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.repository;
 
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.exception.DataNotFoundException;
+import ru.practicum.shareit.common.exception.DataNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class ItemStorageImpl implements ItemStorage {

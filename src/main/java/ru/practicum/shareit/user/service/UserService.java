@@ -1,11 +1,12 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.common.mapper.Mapper;
+import ru.practicum.shareit.common.validation.CheckDataValidation;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.util.mapper.Mapper;
-import ru.practicum.shareit.util.validation.CheckDataValidation;
+import ru.practicum.shareit.user.repository.UserStorage;
 
 import java.util.List;
 import java.util.stream.Collectors;
