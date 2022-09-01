@@ -1,55 +1,17 @@
 package ru.practicum.shareit.user.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import ru.practicum.shareit.common.mapper.Mapper;
-import ru.practicum.shareit.common.validation.CheckDataValidation;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserStorage;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Service
-public class UserService {
-    private final UserStorage userStorage;
-    private final CheckDataValidation validation;
+public interface UserService {
+    UserDto createUser(UserDto userDto);
 
-    @Autowired
-    public UserService(UserStorage userStorage,
-                       CheckDataValidation validation) {
-        this.userStorage = userStorage;
-        this.validation = validation;
-    }
+    UserDto updateUser(long userId, UserDto userDto);
 
-    public UserDto createUser(UserDto userDto) {
-        validation.userCheck(userDto);
-        validation.userValidation(userDto);
+    List<UserDto> findAllUsers();
 
-        User user = Mapper.toUser(userDto);
-        return Mapper.toUserDto(userStorage.createUser(user));
-    }
+    UserDto findUserById(long userId);
 
-    public UserDto updateUser(long userId, UserDto userDto) {
-        validation.userCheck(userDto);
-
-        User user = Mapper.toUser(userDto);
-        user.setId(userId);
-        return Mapper.toUserDto(userStorage.updateUser(user));
-    }
-
-    public List<UserDto> findAllUsers() {
-        return userStorage.findAllUsers().stream()
-                .map(Mapper::toUserDto)
-                .collect(Collectors.toList());
-    }
-
-    public UserDto findUserById(long userId) {
-        return Mapper.toUserDto(userStorage.findUserById(userId));
-    }
-
-    public void deleteUserById(long userId) {
-        userStorage.deleteUserById(userId);
-    }
+    void deleteUserById(long userId);
 }
