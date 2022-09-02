@@ -1,33 +1,34 @@
 package ru.practicum.shareit.item.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.common.mapper.Mapper;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.common.exception.DataNotFoundException;
 import ru.practicum.shareit.common.validation.CheckDataValidation;
+import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.item.comment.dto.CommentInfoDto;
+import ru.practicum.shareit.item.comment.servise.CommentService;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemInfoDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repository.ItemStorage;
+import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserStorage;
+import ru.practicum.shareit.user.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
+    private static final int LIMIT = 2;
     private final CheckDataValidation validation;
-    private final ItemStorage itemStorage;
-    private final UserStorage userStorage;
-
-    @Autowired
-    public ItemServiceImpl(CheckDataValidation validation,
-                           ItemStorage itemStorage,
-                           UserStorage userStorage) {
-        this.validation = validation;
-        this.itemStorage = itemStorage;
-        this.userStorage = userStorage;
-    }
+    private final ItemRepository itemRepository;
+    private final UserService userService;
+    private final CommentService commentService;
 
     @Override
     public ItemDto createItem(long userId, ItemDto itemDto) {
@@ -35,44 +36,53 @@ public class ItemServiceImpl implements ItemService {
         validation.itemValidation(itemDto);
         Item item = checkUserIdAndGetItem(userId, itemDto);
 
-        return Mapper.toItemDto(itemStorage.createItem(userId, item));
+        return ItemMapper.toItemDto(itemRepository.save(item));
     }
 
     @Override
     public ItemDto updateItem(long userId, long itemId, ItemDto itemDto) {
         validation.itemCheck(itemDto);
         Item itemUpdate = checkUserIdAndGetItem(userId, itemDto);
-        validation.itemCheckUser(userId, itemUpdate);
-
-        Item itemOld = itemStorage.findItemById(itemId);
+        Item itemOld = getItemById(itemId);
+        validation.itemCheckUser(userId, itemOld);
 
         Item item = new Item(
                 itemId,
                 itemUpdate.getName() != null ? itemUpdate.getName() : itemOld.getName(),
                 itemUpdate.getDescription() != null ? itemUpdate.getDescription() : itemOld.getDescription(),
-                itemUpdate.getAvailable() != null ? itemUpdate.getAvailable() : itemOld.getAvailable()
+                itemUpdate.getAvailable() != null ? itemUpdate.getAvailable() : itemOld.getAvailable(),
+                itemUpdate.getOwner() != null ? itemUpdate.getOwner() : itemOld.getOwner()
         );
-        return Mapper.toItemDto(itemStorage.updateItem(userId, item));
+        return ItemMapper.toItemDto(itemRepository.save(item));
     }
 
     @Override
-    public ItemDto findItemById(long userId, long itemId) {
-        return Mapper.toItemDto(itemStorage.findItemById(itemId));
+    public ItemInfoDto findItemById(long userId, long itemId) {
+        List<BookingDto> bookings = itemRepository.findBookingForItem(itemId, userId)
+                .stream()
+                .limit(LIMIT)
+                .sorted()
+                .collect(Collectors.toList());
+        BookingDto lastBooking = bookings.size() > 0 ? bookings.get(0) : null;
+        BookingDto nextBooking = bookings.size() >= LIMIT ? bookings.get(1) : null;
+
+        Set<CommentInfoDto> comments = commentService.findAllCommentsForItem(itemId);
+        Item item = getItemById(itemId);
+        return ItemMapper.itemInfoDto(item, lastBooking, nextBooking, comments);
     }
 
     @Override
-    public List<ItemDto> findAllItemByUserId(long userId) {
-        userStorage.findUserById(userId);
-
-        return itemStorage.findAllItemByUserId(userId).stream()
-                .map(Mapper::toItemDto)
+    public List<ItemInfoDto> findAllItemByUserId(long userId) {
+        return itemRepository.findAllItemByOwner_Id(userId).stream()
+                .map(item -> findItemById(userId, item.getId()))
+                .sorted()
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<ItemDto> findAllItem() {
-        return itemStorage.findAllItem().stream()
-                .map(Mapper::toItemDto)
+        return itemRepository.findAll().stream()
+                .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
 
@@ -89,14 +99,20 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void deleteItemById(long userId, long itemId) {
-        itemStorage.deleteItemById(userId, itemId);
+        itemRepository.deleteById(itemId);
+    }
+
+    @Override
+    public Item getItemById(long itemId) {
+        return itemRepository.findById(itemId)
+                .orElseThrow(
+                        () -> new DataNotFoundException(String.format("Объект %d не найден", itemId))
+                );
     }
 
     private Item checkUserIdAndGetItem(long userId, ItemDto itemDto) {
-        User user = userStorage.findUserById(userId);
-        Item item = Mapper.toItem(itemDto);
-        item.setOwner(user);
-        return item;
+        User user = UserMapper.toUser(userService.findUserById(userId));
+        return ItemMapper.toItem(itemDto, user);
     }
 
     private boolean searchInNameOrDescription(ItemDto itemDto, String text) {

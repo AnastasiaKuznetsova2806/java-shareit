@@ -1,5 +1,6 @@
 package ru.practicum.shareit.common.handler;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -33,6 +34,12 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleConflictException(final ConflictException e) {
         return new ErrorResponse(e.getMassage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleDataIntegrityViolationException(final DataIntegrityViolationException e) {
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
