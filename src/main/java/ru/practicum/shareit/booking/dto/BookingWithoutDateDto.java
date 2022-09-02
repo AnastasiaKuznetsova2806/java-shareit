@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import ru.practicum.shareit.util.BookingStatus;
 
-import javax.transaction.Transactional;
-
 @Data
-@Transactional
 @AllArgsConstructor
 public class BookingWithoutDateDto {
     private final BookingStatus status;
