@@ -8,6 +8,7 @@ import ru.practicum.shareit.util.BookingStatus;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -40,4 +41,22 @@ public class Booking {
 
     @Enumerated(value = EnumType.ORDINAL)
     private BookingStatus status;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Booking booking = (Booking) o;
+        return id == booking.id &&
+                Objects.equals(start, booking.start) &&
+                Objects.equals(end, booking.end) &&
+                Objects.equals(item, booking.item) &&
+                Objects.equals(booker, booking.booker) &&
+                status == booking.status;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, start, end, item, booker, status);
+    }
 }

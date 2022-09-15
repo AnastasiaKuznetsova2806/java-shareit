@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -72,27 +74,30 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingInfoDto> findAllBookingUser(long userId, String stateStr) {
+    public List<BookingInfoDto> findAllBookingUser(long userId, String stateStr, Pageable pageable) {
         State state = checkUserAndState(userId, stateStr);
-        List<Booking> bookings;
+        Page<Booking> bookings;
         LocalDateTime timeNow = LocalDateTime.now();
 
         switch (state) {
             case ALL:
-                bookings = bookingRepository.findAllByBooker_IdOrderByStartDesc(userId);
+                bookings = bookingRepository.findAllByBooker_IdOrderByStartDesc(userId, pageable);
                 break;
             case CURRENT:
-                bookings = bookingRepository.findAllByBookerCurrent(userId, timeNow);
+                bookings = bookingRepository.findAllByBookerCurrent(userId, timeNow, pageable);
                 break;
             case PAST:
-                bookings = bookingRepository.findAllByBooker_IdAndEndIsBeforeOrderByStartDesc(userId, timeNow);
+                bookings = bookingRepository.findAllByBooker_IdAndEndIsBeforeOrderByStartDesc(
+                        userId, timeNow, pageable);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findAllByBooker_IdAndEndIsAfterOrderByStartDesc(userId, timeNow);
+                bookings = bookingRepository.findAllByBooker_IdAndEndIsAfterOrderByStartDesc(
+                        userId, timeNow, pageable);
                 break;
             default:
                 BookingStatus bookingStatus = BookingStatus.valueOf(stateStr);
-                bookings = bookingRepository.findAllByBooker_IdAndStatusOrderByStartDesc(userId, bookingStatus);
+                bookings = bookingRepository.findAllByBooker_IdAndStatusOrderByStartDesc(
+                        userId, bookingStatus, pageable);
         }
         return bookings.stream()
                 .map(BookingMapper::toBookingInfoDto)
@@ -100,27 +105,30 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingInfoDto> findBookingAllItemsOwner(long userId, String stateStr) {
+    public List<BookingInfoDto> findBookingAllItemsOwner(long userId, String stateStr, Pageable pageable) {
         State state = checkUserAndState(userId, stateStr);
-        List<Booking> bookings;
+        Page<Booking> bookings;
         LocalDateTime timeNow = LocalDateTime.now();
 
         switch (state) {
             case ALL:
-                bookings = bookingRepository.findAllByItem_Owner_IdOrderByStartDesc(userId);
+                bookings = bookingRepository.findAllByItem_Owner_IdOrderByStartDesc(userId, pageable);
                 break;
             case CURRENT:
-                bookings = bookingRepository.findAllByItemOwnerCurrent(userId, timeNow);
+                bookings = bookingRepository.findAllByItemOwnerCurrent(userId, timeNow, pageable);
                 break;
             case PAST:
-                bookings = bookingRepository.findAllByItem_Owner_IdAndEndIsBeforeOrderByStartDesc(userId, timeNow);
+                bookings = bookingRepository.findAllByItem_Owner_IdAndEndIsBeforeOrderByStartDesc(
+                        userId, timeNow, pageable);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findAllByItem_Owner_IdAndEndIsAfterOrderByStartDesc(userId, timeNow);
+                bookings = bookingRepository.findAllByItem_Owner_IdAndEndIsAfterOrderByStartDesc(
+                        userId, timeNow, pageable);
                 break;
             default:
                 BookingStatus bookingStatus = BookingStatus.valueOf(stateStr);
-                bookings = bookingRepository.findAllByItem_Owner_IdAndStatusOrderByStartDesc(userId, bookingStatus);
+                bookings = bookingRepository.findAllByItem_Owner_IdAndStatusOrderByStartDesc(
+                        userId, bookingStatus, pageable);
         }
         return bookings.stream()
                 .map(BookingMapper::toBookingInfoDto)

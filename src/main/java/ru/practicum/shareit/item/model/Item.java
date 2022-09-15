@@ -27,6 +27,8 @@ public class Item {
     @JoinColumn(name = "OWNER_ID")
     private User owner;
 
+    private Long requestId;
+
     public Item(long id, String name, String description, Boolean available) {
         this.id = id;
         this.name = name;

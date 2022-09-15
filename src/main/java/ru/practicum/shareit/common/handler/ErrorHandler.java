@@ -6,7 +6,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.shareit.common.exception.ConflictException;
 import ru.practicum.shareit.common.exception.DataNotFoundException;
 import ru.practicum.shareit.common.exception.ValidationException;
 
@@ -28,12 +27,6 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidException(final MethodArgumentNotValidException e) {
         return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleConflictException(final ConflictException e) {
-        return new ErrorResponse(e.getMassage());
     }
 
     @ExceptionHandler
