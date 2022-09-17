@@ -6,6 +6,8 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -38,13 +40,18 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Transactional
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class ItemServiceImplTest {
+    @Mock
     private ItemService itemService;
+    @InjectMocks
+    CheckDataValidation validation;
     private ItemRepository itemRepository;
+    @Mock
     private UserService userService;
+    @Mock
     private CommentService commentService;
     private LocalDateTime timeNow;
     private User user;
@@ -56,9 +63,6 @@ class ItemServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        CheckDataValidation validation = mock(CheckDataValidation.class);
-        userService = mock(UserService.class);
-        commentService = mock(CommentService.class);
         itemRepository = mock(ItemRepository.class);
         itemService = new ItemServiceImpl(validation, itemRepository, userService, commentService);
         setParam();

@@ -45,6 +45,14 @@ class CommentRepositoryTest {
         );
     }
 
+    @AfterEach
+    void reset() {
+        userRepository.deleteAll();
+        bookingRepository.deleteAll();
+        itemRepository.deleteAll();
+        commentRepository.deleteAll();
+    }
+
     @Test
     void test_1_findAllByItemId() {
         final Comment comment1 = commentRepository.save(new Comment(
@@ -76,13 +84,5 @@ class CommentRepositoryTest {
         assertThat(result.getBooker(), equalTo(booking.getBooker()));
         assertThat(result.getItem(), equalTo(booking.getItem()));
         assertThat(result.getStatus(), equalTo(booking.getStatus()));
-    }
-
-    @AfterEach
-    void reset() {
-        userRepository.deleteAll();
-        bookingRepository.deleteAll();
-        itemRepository.deleteAll();
-        commentRepository.deleteAll();
     }
 }

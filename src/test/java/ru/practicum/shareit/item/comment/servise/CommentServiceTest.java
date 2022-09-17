@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.comment.servise;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.common.exception.ValidationException;
@@ -30,14 +31,16 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class CommentServiceTest {
+    @Mock
     private CommentRepository commentRepository;
+    @Mock
     private CommentService commentService;
+    @Mock
     private UserService userService;
     private LocalDateTime timeNow;
     private User user;
@@ -47,8 +50,6 @@ class CommentServiceTest {
 
     @BeforeEach
     void setUp() {
-        userService = mock(UserService.class);
-        commentRepository = mock(CommentRepository.class);
         commentService = new CommentService(commentRepository, userService);
         setParam();
     }

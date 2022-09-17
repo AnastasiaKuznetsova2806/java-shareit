@@ -2,6 +2,8 @@ package ru.practicum.shareit.user.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.common.exception.DataNotFoundException;
 import ru.practicum.shareit.common.validation.CheckDataValidation;
@@ -27,13 +29,15 @@ import static org.mockito.Mockito.*;
 class UserServiceImplTest {
     private final UserDto userDto = makeUserDto("user", "user@user.com");
     private final User user = UserMapper.toUser(userDto);
+    @Mock
     private UserService userService;
+    @Mock
     private UserRepository userRepository;
+    @InjectMocks
+    private CheckDataValidation validation;
 
     @BeforeEach
     void setUp() {
-        userRepository = mock(UserRepository.class);
-        CheckDataValidation validation = mock(CheckDataValidation.class);
         userService = new UserServiceImpl(userRepository, validation);
     }
 

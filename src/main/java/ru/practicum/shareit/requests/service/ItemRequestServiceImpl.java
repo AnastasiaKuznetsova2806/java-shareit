@@ -36,9 +36,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public List<ItemRequestInfoDto> findAllItemRequest(long userId) {
         userService.findUserById(userId);
-        List<ItemRequest> requests = itemRequestRepository.findItemRequestByRequestor_Id(userId);
 
-        return requests.stream()
+        return itemRequestRepository.findItemRequestByRequestor_Id(userId).stream()
                 .map(itemRequest -> ItemRequestMapper.toItemRequestInfoDto(
                         itemRequest,
                         itemRequestRepository.findItemsByRequestId(itemRequest.getId())

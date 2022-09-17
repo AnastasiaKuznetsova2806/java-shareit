@@ -47,6 +47,13 @@ class ItemRepositoryTest {
         );
     }
 
+    @AfterEach
+    void reset() {
+        userRepository.deleteAll();
+        bookingRepository.deleteAll();
+        itemRepository.deleteAll();
+    }
+
     @Test
     void test_1_findBookingForItem() {
         final LocalDateTime timeNow = LocalDateTime.now().withNano(0);
@@ -70,12 +77,5 @@ class ItemRepositoryTest {
         assertEquals(2, result.getTotalElements());
         assertThat(result, hasItem(item2));
         assertThat(result, hasItem(item1));
-    }
-
-    @AfterEach
-    void reset() {
-        userRepository.deleteAll();
-        bookingRepository.deleteAll();
-        itemRepository.deleteAll();
     }
 }

@@ -48,6 +48,13 @@ class BookingRepositoryTest {
         );
     }
 
+    @AfterEach
+    void reset() {
+        userRepository.deleteAll();
+        bookingRepository.deleteAll();
+        itemRepository.deleteAll();
+    }
+
     @Test
     void test_1_findAllByBooker_IdOrderByStartDesc() {
         Page<Booking> result = bookingRepository.findAllByBooker_IdOrderByStartDesc(
@@ -148,12 +155,5 @@ class BookingRepositoryTest {
         assertThat(result, notNullValue());
         assertEquals(1, result.getTotalElements());
         assertThat(result, hasItem(booking1));
-    }
-
-    @AfterEach
-    void reset() {
-        userRepository.deleteAll();
-        bookingRepository.deleteAll();
-        itemRepository.deleteAll();
     }
 }

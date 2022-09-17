@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -80,11 +81,7 @@ class UserControllerTest {
         when(userService.findAllUsers())
                 .thenReturn(Arrays.asList(userDto, userDto2));
 
-        mvc.perform(get("/users")
-                        .content(mapper.writeValueAsString(userDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+        contentCreation("", null, userDto)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id", is(userDto.getId()), Long.class))
@@ -102,11 +99,7 @@ class UserControllerTest {
         when(userService.findUserById(anyLong()))
                 .thenReturn(userDto);
 
-        mvc.perform(get("/users/{userId}", 1L)
-                        .content(mapper.writeValueAsString(userDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+        contentCreation("/{userId}", 1L, userDto)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(userDto.getId()), Long.class))
                 .andExpect(jsonPath("$.name", is(userDto.getName())))
@@ -125,5 +118,13 @@ class UserControllerTest {
     private void createUser(UserDto userDto) {
         when(userService.createUser(any()))
                 .thenReturn(userDto);
+    }
+
+    private ResultActions contentCreation(String url, Long param, UserDto dto) throws Exception {
+        return mvc.perform(get("/users" + url, param)
+                .content(mapper.writeValueAsString(dto))
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON));
     }
 }

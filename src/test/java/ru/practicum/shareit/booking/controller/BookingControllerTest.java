@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingInfoDto;
 import ru.practicum.shareit.booking.dto.BookingWithoutDateDto;
@@ -107,12 +108,7 @@ class BookingControllerTest {
         when(bookingService.findBookingById(anyLong(), anyLong()))
                 .thenReturn(bookingInfoDto);
 
-        mvc.perform(get("/bookings/{bookingId}", 1L)
-                        .content(mapper.writeValueAsString(bookingInfoDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1)
-                        .accept(MediaType.APPLICATION_JSON))
+        contentCreation("/{bookingId}", 1L, bookingInfoDto)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(bookingInfoDto.getId()), Long.class))
                 .andExpect(jsonPath("$.start", is(bookingInfoDto.getStart().toString())))
@@ -127,12 +123,7 @@ class BookingControllerTest {
         when(bookingService.findAllBookingUser(1L, "ALL", PageRequest.ofSize(10)))
                 .thenReturn(Collections.singletonList(bookingInfoDto));
 
-        mvc.perform(get("/bookings")
-                        .content(mapper.writeValueAsString(bookingInfoDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1)
-                        .accept(MediaType.APPLICATION_JSON))
+        contentCreation("", null, bookingInfoDto)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id", is(bookingInfoDto.getId()), Long.class))
@@ -151,12 +142,7 @@ class BookingControllerTest {
         when(bookingService.findBookingAllItemsOwner(1L, "ALL", PageRequest.ofSize(10)))
                 .thenReturn(Collections.singletonList(bookingInfoDto));
 
-        mvc.perform(get("/bookings/owner")
-                        .content(mapper.writeValueAsString(bookingInfoDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1)
-                        .accept(MediaType.APPLICATION_JSON))
+        contentCreation("/owner", null, bookingInfoDto)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id", is(bookingInfoDto.getId()), Long.class))
@@ -171,5 +157,14 @@ class BookingControllerTest {
     private void createBooking(BookingDto bookingDto) {
         when(bookingService.createBooking(anyLong(), any()))
                 .thenReturn(bookingDto);
+    }
+
+    private ResultActions contentCreation(String url, Long param, BookingInfoDto dto) throws Exception {
+        return mvc.perform(get("/bookings" + url, param)
+                .content(mapper.writeValueAsString(dto))
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Sharer-User-Id", 1)
+                .accept(MediaType.APPLICATION_JSON));
     }
 }

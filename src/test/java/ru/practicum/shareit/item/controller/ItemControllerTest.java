@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import ru.practicum.shareit.item.comment.dto.CommentInfoDto;
 import ru.practicum.shareit.item.comment.servise.CommentService;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -111,12 +112,7 @@ class ItemControllerTest {
         when(itemService.findItemById(anyLong(), anyLong()))
                 .thenReturn(itemInfoDto);
 
-        mvc.perform(get("/items/{itemId}", 1L)
-                .content(mapper.writeValueAsString(itemInfoDto))
-                .characterEncoding(StandardCharsets.UTF_8)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("X-Sharer-User-Id", 1)
-                .accept(MediaType.APPLICATION_JSON))
+        contentCreation("/{itemId}", 1L, itemInfoDto)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(itemInfoDto.getId()), Long.class))
                 .andExpect(jsonPath("$.name", is(itemInfoDto.getName())))
@@ -135,12 +131,7 @@ class ItemControllerTest {
         when(itemService.findAllItemByUserId(1, PageRequest.ofSize(10)))
                 .thenReturn(Collections.singletonList(itemInfoDto));
 
-        mvc.perform(get("/items")
-                        .content(mapper.writeValueAsString(itemInfoDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1)
-                        .accept(MediaType.APPLICATION_JSON))
+        contentCreation("", null, itemInfoDto)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id", is(itemInfoDto.getId()), Long.class))
@@ -215,5 +206,14 @@ class ItemControllerTest {
 
     private Set<CommentInfoDto> getComments() {
         return new HashSet<>(Collections.singletonList(commentInfoDto));
+    }
+
+    private ResultActions contentCreation(String url, Long param, ItemInfoDto dto) throws Exception {
+        return mvc.perform(get("/items" + url, param)
+                .content(mapper.writeValueAsString(dto))
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Sharer-User-Id", 1)
+                .accept(MediaType.APPLICATION_JSON));
     }
 }

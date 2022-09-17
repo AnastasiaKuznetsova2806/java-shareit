@@ -47,6 +47,13 @@ class ItemRequestRepositoryTest {
         itemRequest2 = itemRequestRepository.save(new ItemRequest(2L,"2 description", user, timeNow));
     }
 
+    @AfterEach
+    void reset() {
+        userRepository.deleteAll();
+        itemRepository.deleteAll();
+        itemRequestRepository.deleteAll();
+    }
+
     @Test
     void test_1_findItemRequestByRequestor_Id() {
         List<ItemRequest> result = itemRequestRepository.findItemRequestByRequestor_Id(user.getId());
@@ -87,12 +94,5 @@ class ItemRequestRepositoryTest {
         assertThat(result, notNullValue());
         assertEquals(2, result.getTotalElements());
         assertThat(result, hasItem(itemRequestDto2));
-    }
-
-    @AfterEach
-    void reset() {
-        userRepository.deleteAll();
-        itemRepository.deleteAll();
-        itemRequestRepository.deleteAll();
     }
 }

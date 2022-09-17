@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.requests.dto.ItemRequestDto;
 import ru.practicum.shareit.requests.dto.ItemRequestInfoDto;
@@ -75,12 +76,7 @@ class ItemRequestControllerTest {
         when(itemRequestService.findAllItemRequest(anyLong()))
                 .thenReturn(Collections.singletonList(itemRequestInfoDto));
 
-        mvc.perform(get("/requests")
-                        .content(mapper.writeValueAsString(itemRequestInfoDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1)
-                        .accept(MediaType.APPLICATION_JSON))
+        contentCreation("", null, itemRequestInfoDto)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id", is(itemRequestInfoDto.getId()), Long.class))
@@ -95,12 +91,7 @@ class ItemRequestControllerTest {
         when(itemRequestService.findAllItemRequestByOtherUser(1, PageRequest.ofSize(10)))
                 .thenReturn(Collections.singletonList(itemRequestInfoDto));
 
-        mvc.perform(get("/requests/all")
-                        .content(mapper.writeValueAsString(itemRequestInfoDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1)
-                        .accept(MediaType.APPLICATION_JSON))
+        contentCreation("/all", null, itemRequestInfoDto)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id", is(itemRequestInfoDto.getId()), Long.class))
@@ -118,12 +109,7 @@ class ItemRequestControllerTest {
         when(itemRequestService.findItemRequestById(anyLong(), anyLong()))
                 .thenReturn(itemRequestInfoDto);
 
-        mvc.perform(get("/requests/{requestId}", 1L)
-                        .content(mapper.writeValueAsString(itemRequestInfoDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1)
-                        .accept(MediaType.APPLICATION_JSON))
+        contentCreation("/{requestId}", 1L, itemRequestInfoDto)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(itemRequestInfoDto.getId()), Long.class))
                 .andExpect(jsonPath("$.description", is(itemRequestInfoDto.getDescription())))
@@ -143,5 +129,14 @@ class ItemRequestControllerTest {
                 2L, "item2", "description2", true, 1L, 2L);
 
         return new HashSet<>(Arrays.asList(itemDto, itemDto2));
+    }
+
+    private ResultActions contentCreation(String url, Long param, ItemRequestInfoDto dto) throws Exception {
+        return mvc.perform(get("/requests" + url, param)
+                .content(mapper.writeValueAsString(dto))
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Sharer-User-Id", 1)
+                .accept(MediaType.APPLICATION_JSON));
     }
 }

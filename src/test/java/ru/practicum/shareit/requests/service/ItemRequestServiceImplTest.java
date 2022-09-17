@@ -2,6 +2,7 @@ package ru.practicum.shareit.requests.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -30,8 +31,11 @@ import static org.mockito.Mockito.*;
 @Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class ItemRequestServiceImplTest {
+    @Mock
     private ItemRequestService itemRequestService;
+    @Mock
     private ItemRequestRepository itemRequestRepository;
+    @Mock
     private UserService userService;
     private LocalDateTime timeNow;
     private UserDto userDto;
@@ -41,8 +45,6 @@ class ItemRequestServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        userService = mock(UserService.class);
-        itemRequestRepository = mock(ItemRequestRepository.class);
         itemRequestService = new ItemRequestServiceImpl(itemRequestRepository, userService);
         setParam();
     }

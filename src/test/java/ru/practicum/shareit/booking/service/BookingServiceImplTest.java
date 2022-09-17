@@ -2,6 +2,8 @@ package ru.practicum.shareit.booking.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -35,15 +37,20 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class BookingServiceImplTest {
+    @Mock
     private BookingService bookingService;
+    @Mock
     private BookingRepository bookingRepository;
+    @InjectMocks
+    private CheckDataValidation validation;
+    @Mock
     private UserService userService;
+    @Mock
     private ItemService itemService;
     private UserDto userDto;
     private Item item;
@@ -54,10 +61,6 @@ class BookingServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        CheckDataValidation validation = mock(CheckDataValidation.class);
-        userService = mock(UserService.class);
-        itemService = mock(ItemService.class);
-        bookingRepository = mock(BookingRepository.class);
         bookingService = new BookingServiceImpl(
                 bookingRepository, validation, userService, itemService
         );
@@ -238,11 +241,6 @@ class BookingServiceImplTest {
 
     @Test
     void test_13_findAllBookingUserValidationException() {
-        when(bookingRepository.findAllByBooker_IdAndStatusOrderByStartDesc(anyLong(), any(), any()))
-                .thenThrow(
-                        new ValidationException("Unknown state: UNSUPPORTED_STATUS")
-                );
-
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 () -> bookingService.findAllBookingUser(
@@ -317,11 +315,6 @@ class BookingServiceImplTest {
 
     @Test
     void test_19_findBookingAllItemsOwnerValidationException() {
-        when(bookingRepository.findAllByItem_Owner_IdAndStatusOrderByStartDesc(anyLong(), any(), any()))
-                .thenThrow(
-                        new ValidationException("Unknown state: UNSUPPORTED_STATUS")
-                );
-
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 () -> bookingService.findAllBookingUser(
