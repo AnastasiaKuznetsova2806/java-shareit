@@ -19,14 +19,15 @@ public class ItemMapper {
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
-                item.getOwner().getId()
+                item.getOwner().getId(),
+                item.getRequestId()
         );
     }
 
-    public static ItemInfoDto itemInfoDto(Item item,
-                                          BookingDto lastBooking,
-                                          BookingDto nextBooking,
-                                          Set<CommentInfoDto> comments) {
+    public static ItemInfoDto toItemInfoDto(Item item,
+                                            BookingDto lastBooking,
+                                            BookingDto nextBooking,
+                                            Set<CommentInfoDto> comments) {
         return new ItemInfoDto(
                 item.getName(),
                 item.getDescription(),
@@ -54,7 +55,8 @@ public class ItemMapper {
                 itemDto.getName() != null ? itemDto.getName() : null,
                 itemDto.getDescription() != null ? itemDto.getDescription() : null,
                 itemDto.getAvailable() != null ? itemDto.getAvailable() : null,
-                user
+                user,
+                itemDto.getRequestId() != null ? itemDto.getRequestId() : null
         );
     }
 }

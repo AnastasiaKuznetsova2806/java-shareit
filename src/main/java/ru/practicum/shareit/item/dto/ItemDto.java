@@ -11,4 +11,5 @@ public class ItemDto {
     private final String description;
     private final Boolean available;
     private final Long owner;
+    private final Long requestId;
 }

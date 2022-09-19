@@ -1,5 +1,7 @@
 package ru.practicum.shareit.item.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -20,5 +22,5 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "order by b.start")
     List<BookingDto> findBookingForItem(long itemId, long userId);
 
-    List<Item> findAllItemByOwner_Id(long userId);
+    Page<Item> findAllItemByOwner_Id(long userId, Pageable pageable);
 }

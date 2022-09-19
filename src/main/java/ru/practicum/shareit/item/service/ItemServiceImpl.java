@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.common.exception.DataNotFoundException;
@@ -51,7 +52,8 @@ public class ItemServiceImpl implements ItemService {
                 itemUpdate.getName() != null ? itemUpdate.getName() : itemOld.getName(),
                 itemUpdate.getDescription() != null ? itemUpdate.getDescription() : itemOld.getDescription(),
                 itemUpdate.getAvailable() != null ? itemUpdate.getAvailable() : itemOld.getAvailable(),
-                itemUpdate.getOwner() != null ? itemUpdate.getOwner() : itemOld.getOwner()
+                itemUpdate.getOwner() != null ? itemUpdate.getOwner() : itemOld.getOwner(),
+                itemUpdate.getRequestId() != null ? itemUpdate.getRequestId() : null
         );
         return ItemMapper.toItemDto(itemRepository.save(item));
     }
@@ -68,28 +70,28 @@ public class ItemServiceImpl implements ItemService {
 
         Set<CommentInfoDto> comments = commentService.findAllCommentsForItem(itemId);
         Item item = getItemById(itemId);
-        return ItemMapper.itemInfoDto(item, lastBooking, nextBooking, comments);
+        return ItemMapper.toItemInfoDto(item, lastBooking, nextBooking, comments);
     }
 
     @Override
-    public List<ItemInfoDto> findAllItemByUserId(long userId) {
-        return itemRepository.findAllItemByOwner_Id(userId).stream()
+    public List<ItemInfoDto> findAllItemByUserId(long userId, Pageable pageable) {
+        return itemRepository.findAllItemByOwner_Id(userId, pageable).stream()
                 .map(item -> findItemById(userId, item.getId()))
                 .sorted()
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<ItemDto> findAllItem() {
-        return itemRepository.findAll().stream()
+    public List<ItemDto> findAllItem(Pageable pageable) {
+        return itemRepository.findAll(pageable).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<ItemDto> searchItem(long userId, String text) {
+    public List<ItemDto> searchItem(long userId, String text, Pageable pageable) {
         if (!text.isEmpty() || !text.isBlank()) {
-            return findAllItem().stream()
+            return findAllItem(pageable).stream()
                     .filter(itemDto -> searchInNameOrDescription(itemDto, text))
                     .filter(ItemDto::getAvailable)
                     .collect(Collectors.toList());
