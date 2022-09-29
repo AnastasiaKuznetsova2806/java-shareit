@@ -47,7 +47,7 @@ public class BookingController {
     @GetMapping
     public ResponseEntity<Object> findAllBookingUser(
             @RequestHeader(CommonConstant.USER_ID_HEADER) long userId,
-            @RequestParam(value = "state", defaultValue = STATE_DEFAULT) String state,
+            @RequestParam(defaultValue = STATE_DEFAULT) String state,
             @PositiveOrZero @RequestParam(defaultValue =  CommonConstant.DEFAULT_FROM) int from,
             @Positive @RequestParam(defaultValue = CommonConstant.DEFAULT_SIZE) int size) {
         State bookingState = getBookingState(state);
